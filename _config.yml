@@ -1,9 +1,13 @@
 title: Secure Auth Guide
 description: Authenticator-app 2FA, DNS tampering warnings, and safe-money habits.
+url: "https://exicoart.github.io"
+baseurl: "/androidAuthAppTo6Digits"
 
 # Files and folders that should not be part of the published site.
 exclude:
   - android
+  - README.md
+  - assets/README.md
   - SECURITY.md
   - LICENSE
   - .gitignore

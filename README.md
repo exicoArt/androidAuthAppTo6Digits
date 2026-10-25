@@ -4,6 +4,8 @@
 
 > **Status:** early draft. Everything here is educational guidance, not a security audit or financial advice.
 
+**Published site:** once GitHub Pages is switched on (see `.github/workflows/jekyll-docker.yml`), the guide is served at https://exicoart.github.io/androidAuthAppTo6Digits/
+
 ## Why this project exists
 
 Passwords alone are easy to lose: they get reused, guessed, leaked and phished. An authenticator app adds a second step that changes every 30 seconds, so a stolen password is not enough to take over an account. This guide explains how to set one up correctly and what it does and does not protect you from.
@@ -17,7 +19,8 @@ Passwords alone are easy to lose: they get reused, guessed, leaked and phished. 
 | [docs/safe-money-checklist.md](docs/safe-money-checklist.md) | Habits and checks for keeping your money safe online |
 | [docs/dns-mismatch-trap.md](docs/dns-mismatch-trap.md) | Detecting DNS tampering (app vs browser answers) and sending the user to a safe warning page |
 | [trap/index.html](trap/index.html) | The warning landing page, featuring the Tulou lamp 3D model |
-| [android/DnsMismatchCheck.kt](android/DnsMismatchCheck.kt) | Untested Kotlin sketch of the DNS comparison step |
+| [docs/architecture.md](docs/architecture.md) | How the Android app fits together, and the rules it follows |
+| [android/core](android/core) | Kotlin core: Base32, TOTP (RFC 6238), `otpauth://` parsing, DNS check, safe code gate, with unit tests |
 | [assets/](assets/) | The Tulou lamp 3D model (`Tulou-lamp.glb`) |
 | [SECURITY.md](SECURITY.md) | How to report a problem with this guide |
 
@@ -28,6 +31,17 @@ Passwords alone are easy to lose: they get reused, guessed, leaked and phished. 
 3. **Save your backup codes offline** in a safe place, separate from your phone.
 4. **Never type a 6-digit code into a page you reached from a link or message.** Go to the site yourself. Real support staff will never ask you for a code.
 5. **For money, slow down.** Urgency is the scammer's main tool. Verify through a channel you started yourself.
+
+## Roadmap
+
+- [x] Guide: setup, threat model, safe-money checklist
+- [x] DNS-mismatch warning design and lamp warning page
+- [x] Kotlin core: Base32, TOTP, `otpauth://` parsing, DNS check, safe code gate (unit tests run in CI)
+- [x] Jekyll site and CI workflows
+- [ ] Real TLS certificate check for the gate
+- [ ] Secure storage (Android Keystore)
+- [ ] Android app screens: add account, codes with countdown, link check
+- [ ] Turn on GitHub Pages
 
 ## Contributing
 

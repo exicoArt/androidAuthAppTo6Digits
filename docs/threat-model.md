@@ -1,3 +1,8 @@
+---
+layout: default
+title: "Threat model: what 2FA protects against"
+---
+
 # Threat model: what 2FA protects against
 
 | Threat | Does an authenticator app help? | What else you should do |

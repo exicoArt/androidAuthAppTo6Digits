@@ -1,3 +1,8 @@
+---
+layout: default
+title: "Safe money checklist"
+---
+
 # Safe money checklist
 
 General habits, not financial or legal advice. For your own situation, talk to your bank or a qualified advisor.

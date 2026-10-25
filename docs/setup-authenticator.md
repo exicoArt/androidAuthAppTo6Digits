@@ -1,3 +1,8 @@
+---
+layout: default
+title: "Setting up an authenticator app"
+---
+
 # Setting up an authenticator app
 
 ## How it works

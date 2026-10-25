@@ -1,3 +1,8 @@
+---
+layout: default
+title: "DNS mismatch warning ('trap page')"
+---
+
 # DNS mismatch warning ("trap page")
 
 If the authenticator app and the user's browser see **different answers for the same domain**, something may be tampering with DNS (a hijacked router, malicious Wi-Fi, a poisoned resolver, or malware that changed the hosts file). In that case the app does not let the user carry on to the real-looking site. It sends them to a safe landing page, the [lamp warning page](../trap/index.html), that explains what was detected and has no login form.
@@ -60,7 +65,7 @@ An app can't redirect the browser by itself, so choose one route:
 - **Local DNS filter:** a `VpnService` that checks DNS answers on the device. This is powerful, so it needs a clear permission screen and a strict privacy policy.
 - **Guidance only:** tell users to set Android's **Private DNS** (DNS over TLS) to a resolver they trust.
 
-See [`android/DnsMismatchCheck.kt`](../android/DnsMismatchCheck.kt) for a starting sketch of the comparison step.
+See [`DnsMismatchCheck.kt`](https://github.com/exicoArt/androidAuthAppTo6Digits/blob/main/android/core/src/main/kotlin/com/example/authapp/dnscheck/DnsMismatchCheck.kt) for the comparison step and [`SafeCodeGate.kt`](https://github.com/exicoArt/androidAuthAppTo6Digits/blob/main/android/core/src/main/kotlin/com/example/authapp/gate/SafeCodeGate.kt) for the decision to show the warning page.
 
 ## Privacy
 

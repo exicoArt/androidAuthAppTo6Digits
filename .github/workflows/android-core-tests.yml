@@ -1,0 +1,46 @@
+name: Android core tests
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "android/**"
+      - ".github/workflows/android-core-tests.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "android/**"
+      - ".github/workflows/android-core-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+
+      - name: Run the unit tests
+        run: gradle -p android/core test --console=plain
+
+      - name: Upload the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-core-test-report
+          path: android/core/build/reports/tests/test
+          if-no-files-found: ignore

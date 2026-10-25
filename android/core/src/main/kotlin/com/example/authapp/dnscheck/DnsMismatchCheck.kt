@@ -8,7 +8,7 @@ import java.net.URL
 import java.net.URLEncoder
 
 /**
- * REFERENCE SKETCH, not production code and not compiled or tested yet.
+ * Early version. The network calls are not covered by tests yet.
  *
  * Compares what the device's normal resolver returns for a domain with what
  * encrypted DNS-over-HTTPS (DoH) resolvers return. Run it off the main thread.
