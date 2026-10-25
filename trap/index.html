@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Connection check</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+  :root {
+    --bone: #efe9dc;
+    --charcoal: #1d1f22;
+    --charcoal-2: #2a2d31;
+    --amber: #ffb000;
+    --amber-soft: #ffd98a;
+    --text: #efe9dc;
+    --muted: #b9b3a6;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bone: #1d1f22;
+      --charcoal: #f6f2e9;
+      --charcoal-2: #ebe5d6;
+      --amber: #b36b00;
+      --amber-soft: #7a4a00;
+      --text: #1d1f22;
+      --muted: #5c574c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--charcoal);
+    color: var(--text);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+  .banner {
+    border-left: 6px solid var(--amber);
+    background: var(--charcoal-2);
+    padding: 16px 18px;
+    border-radius: 8px;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  .banner p { margin: 0; color: var(--muted); }
+  .grid { display: grid; gap: 24px; margin-top: 24px; grid-template-columns: 1fr; }
+  @media (min-width: 800px) { .grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+  model-viewer {
+    width: 100%;
+    height: 380px;
+    background: radial-gradient(circle at 50% 40%, var(--charcoal-2), var(--charcoal));
+    border-radius: 12px;
+    --poster-color: transparent;
+  }
+  .status { margin: 8px 2px 0; font-size: .85rem; color: var(--muted); }
+  h2 { font-size: 1.05rem; margin: 0 0 8px; color: var(--amber-soft); }
+  dl { margin: 0 0 20px; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; word-break: break-all; }
+  ul { margin: 0 0 20px; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  a.btn {
+    display: inline-block; padding: 10px 16px; border-radius: 8px;
+    background: var(--amber); color: #1d1f22; text-decoration: none; font-weight: 600;
+  }
+  a.btn:focus-visible { outline: 3px solid var(--bone); outline-offset: 2px; }
+  footer { margin-top: 32px; font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="banner" role="alert">
+    <h1>We stopped this connection</h1>
+    <p>The address your device received for this site does not match what our app got from a trusted, encrypted lookup. This can mean your network is being tampered with.</p>
+  </div>
+
+  <div class="grid">
+    <section aria-label="3D lamp">
+      <model-viewer
+        src="../assets/Tulou-lamp.glb"
+        alt="Openwork lattice table lamp shaped like a circular tulou, a Fujian earthen roundhouse"
+        camera-controls
+        auto-rotate
+        interaction-prompt="none"
+        shadow-intensity="1"
+        exposure="1">
+      </model-viewer>
+      <p class="status" id="model-status">Loading the lamp (large file)…</p>
+    </section>
+
+    <section aria-label="What was detected">
+      <h2>What we saw</h2>
+      <dl>
+        <dt>Site</dt><dd id="v-domain">not provided</dd>
+        <dt>Expected address</dt><dd id="v-expected">not provided</dd>
+        <dt>Your device got</dt><dd id="v-seen">not provided</dd>
+      </dl>
+
+      <h2>What to do now</h2>
+      <ul>
+        <li>Do not enter your password or any 6-digit code on the site you were heading to.</li>
+        <li>Switch networks, for example from public Wi-Fi to mobile data.</li>
+        <li>Restart your router, and turn on Private DNS in your phone's network settings.</li>
+        <li>Open the service through its official app or by typing its address yourself.</li>
+      </ul>
+
+      <div class="actions">
+        <a class="btn" href="about:blank" id="leave">Leave this page</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    This page has no login form and collects nothing. The values above come from the link that brought you here.
+  </footer>
+</main>
+
+<script>
+  // Show query values as plain text only, and only if they look like a hostname or IP.
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var safe = /^[A-Za-z0-9.\-:]{1,253}$/;
+    [["domain", "v-domain"], ["expected", "v-expected"], ["seen", "v-seen"]].forEach(function (p) {
+      var v = params.get(p[0]);
+      if (v && safe.test(v)) { document.getElementById(p[1]).textContent = v; }
+    });
+
+    var mv = document.querySelector("model-viewer");
+    var status = document.getElementById("model-status");
+    mv.addEventListener("load", function () { status.textContent = "Drag to rotate the lamp."; });
+    mv.addEventListener("error", function () { status.textContent = "The lamp could not be loaded. The warning above still applies."; });
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { mv.removeAttribute("auto-rotate"); }
+  })();
+</script>
+</body>
+</html>

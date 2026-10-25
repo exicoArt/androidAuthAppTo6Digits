@@ -15,6 +15,10 @@ Passwords alone are easy to lose: they get reused, guessed, leaked and phished. 
 | [docs/setup-authenticator.md](docs/setup-authenticator.md) | Setting up an authenticator app, and handling the QR code safely |
 | [docs/threat-model.md](docs/threat-model.md) | Bots, malicious accounts, phishing links: what 2FA stops and what it doesn't |
 | [docs/safe-money-checklist.md](docs/safe-money-checklist.md) | Habits and checks for keeping your money safe online |
+| [docs/dns-mismatch-trap.md](docs/dns-mismatch-trap.md) | Detecting DNS tampering (app vs browser answers) and sending the user to a safe warning page |
+| [trap/index.html](trap/index.html) | The warning landing page, featuring the Tulou lamp 3D model |
+| [android/DnsMismatchCheck.kt](android/DnsMismatchCheck.kt) | Untested Kotlin sketch of the DNS comparison step |
+| [assets/](assets/) | The Tulou lamp 3D model (`Tulou-lamp.glb`) |
 | [SECURITY.md](SECURITY.md) | How to report a problem with this guide |
 
 ## Key ideas in one minute
