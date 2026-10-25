@@ -33,3 +33,15 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Never commit secrets, TOTP setup keys, or screenshots of QR codes
+.env
+.env.*
+*secret*
+*backup-codes*
+*recovery*
+*qr*.png
+*qr*.jpg
+*qr*.jpeg
+*.pem
+*.key
