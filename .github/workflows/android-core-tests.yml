@@ -37,6 +37,23 @@ jobs:
       - name: Run the unit tests
         run: gradle -p android/core test --console=plain
 
+      - name: Show how many tests ran
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob
+          import xml.etree.ElementTree as ET
+          tests = failures = errors = skipped = 0
+          files = glob.glob("android/core/build/test-results/test/*.xml")
+          for path in files:
+              root = ET.parse(path).getroot()
+              tests += int(root.get("tests", 0))
+              failures += int(root.get("failures", 0))
+              errors += int(root.get("errors", 0))
+              skipped += int(root.get("skipped", 0))
+          print(f"::notice title=Unit test results::{tests} tests in {len(files)} classes, {failures} failures, {errors} errors, {skipped} skipped")
+          PY
+
       - name: Upload the test report
         if: always()
         uses: actions/upload-artifact@v4
