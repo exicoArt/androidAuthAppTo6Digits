@@ -1,0 +1,58 @@
+name: Jekyll site CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Build the site in the jekyll/builder container
+        run: |
+          docker run --rm \
+            -e JEKYLL_ENV=production \
+            -v "${{ github.workspace }}:/srv/jekyll" \
+            jekyll/builder:latest \
+            /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build"
+
+      - name: Check the built site has the key files
+        run: |
+          test -f _site/trap/index.html
+          test -f _site/assets/Tulou-lamp.glb
+
+      - name: Upload the site as a Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  # Deploys to GitHub Pages only on main, and only when the repository
+  # variable DEPLOY_PAGES is set to "true" (Settings > Secrets and variables >
+  # Actions > Variables). Pages must also be set to "GitHub Actions" as its
+  # source (Settings > Pages).
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_PAGES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

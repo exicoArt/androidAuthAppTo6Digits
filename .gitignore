@@ -45,3 +45,8 @@ google-services.json
 *qr*.jpeg
 *.pem
 *.key
+
+# Jekyll build output
+_site/
+.jekyll-cache/
+.jekyll-metadata

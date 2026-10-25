@@ -1,0 +1,11 @@
+title: Secure Auth Guide
+description: Authenticator-app 2FA, DNS tampering warnings, and safe-money habits.
+
+# Files and folders that should not be part of the published site.
+exclude:
+  - android
+  - SECURITY.md
+  - LICENSE
+  - .gitignore
+  - Gemfile
+  - Gemfile.lock
