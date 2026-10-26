@@ -50,6 +50,21 @@ From cheapest to strongest. Use as many as you can.
 | Differ and TLS fails or the IP is private/loopback | Show the landing page, do not show or accept codes for this domain |
 | Differ and a second encrypted resolver disagrees too | Show the landing page and suggest switching networks |
 
+## What the landing page does with the link
+
+The page cannot check anyone's connection itself. It only displays the values in the link the app sends, so it behaves differently depending on those values:
+
+| Link | What the page shows |
+| --- | --- |
+| No values (opened on its own) | "Nothing to report", with an explanation and a link to an example |
+| Site and two addresses that match | "No mismatch found" |
+| Addresses differ | The warning, what was seen, and what to do |
+| The device's address is private or loopback | The warning, plus a note that a public site should never resolve to one |
+| Missing or invalid values | "This link could not be read" |
+| `?demo=1` | An example warning, clearly labelled as made up |
+
+Values are shown as plain text only after they pass a hostname or IP check, so a crafted link cannot inject markup. Because anyone can write such a link, a warning only means something when the app sent you.
+
 ## What the landing page should tell the user
 
 - What was seen, shown as plain text: the domain, the address the app expected, and the address the device got.

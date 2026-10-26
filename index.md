@@ -21,8 +21,7 @@ A practical, plain-language guide to setting up an authenticator app (two-factor
 
 ## See the warning page
 
-[Open the lamp warning page]({{ '/trap/' | relative_url }}). This is the safe landing page the app shows when a site's address does not match what a trusted, encrypted lookup returned. You can preview it with sample values:
-[example]({{ '/trap/' | relative_url }}?domain=bank.example.com&expected=203.0.113.7&seen=10.0.0.5).
+[Open the lamp page]({{ '/trap/' | relative_url }}). This is the safe landing page the app shows when a site's address does not match what a trusted, encrypted lookup returned. Opened on its own it reports nothing, because it only warns when the app sends it values that do not match. You can [see an example warning]({{ '/trap/' | relative_url }}?demo=1) (made-up values).
 
 ## Key ideas in one minute
 

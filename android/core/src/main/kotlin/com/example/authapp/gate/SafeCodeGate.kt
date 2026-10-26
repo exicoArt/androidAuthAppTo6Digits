@@ -52,8 +52,12 @@ class SafeCodeGate(
     }
 
     internal fun trapUrl(result: DnsCheckResult): String {
-        val expected = result.dohIps.values.flatten().sorted().firstOrNull()
-        val seen = result.systemIps.sorted().firstOrNull()
+        val trusted = result.dohIps.values.flatten().toSet()
+        val expected = trusted.sorted().firstOrNull()
+        // Show an address the device got that the trusted lookup did NOT return, so the warning page
+        // points at the odd one out. Fall back to any address the device got.
+        val seen = result.systemIps.filter { it !in trusted }.sorted().firstOrNull()
+            ?: result.systemIps.sorted().firstOrNull()
         val params = buildList {
             add("domain=" + enc(result.domain))
             if (expected != null) add("expected=" + enc(expected))

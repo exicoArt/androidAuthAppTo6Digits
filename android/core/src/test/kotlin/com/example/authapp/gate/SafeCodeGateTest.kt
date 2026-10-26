@@ -51,6 +51,25 @@ class SafeCodeGateTest {
     }
 
     @Test
+    fun trapUrlShowsTheAddressThatIsNotInTheTrustedAnswers() {
+        // The device also got the real address, but sorted order would pick the private one first
+        // only by luck. Here the odd one out sorts last, and must still be the one shown.
+        val g = SafeCodeGate(
+            trapPageBase = trapBase,
+            check = {
+                result(
+                    DnsVerdict.HIGH_RISK,
+                    setOf("203.0.113.7", "9.9.9.9"),
+                    mapOf("cloudflare" to setOf("203.0.113.7")),
+                )
+            },
+        )
+        val block = g.decide("bank.example.com") as CodeGateDecision.Block
+        assertTrue(block.trapUrl.contains("seen=9.9.9.9"), block.trapUrl)
+        assertTrue(block.trapUrl.contains("expected=203.0.113.7"), block.trapUrl)
+    }
+
+    @Test
     fun trapUrlOmitsMissingAddressesAndKeepsExistingQueryStrings() {
         val g = SafeCodeGate(
             trapPageBase = "https://example.com/trap?lang=en",

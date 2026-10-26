@@ -41,6 +41,11 @@
     padding: 16px 18px;
     border-radius: 8px;
   }
+  .banner-ok { border-left-color: #2e8b57; }
+  .banner-info { border-left-color: var(--muted); }
+  .demo-tag { margin: 12px 0 0; padding: 8px 12px; border: 1px dashed var(--amber); border-radius: 8px; color: var(--amber-soft); font-size: .9rem; }
+  .note { color: var(--amber-soft); }
+  [hidden] { display: none !important; }
   h1 { margin: 0 0 6px; font-size: 1.5rem; }
   .banner p { margin: 0; color: var(--muted); }
   .grid { display: grid; gap: 24px; margin-top: 24px; grid-template-columns: 1fr; }
@@ -69,11 +74,24 @@
 </style>
 </head>
 <body>
-<main>
-  <div class="banner" role="alert">
+<main data-state="loading">
+  <div class="banner banner-warn" id="b-warn" role="alert" hidden>
     <h1>We stopped this connection</h1>
-    <p>The address your device received for this site does not match what our app got from a trusted, encrypted lookup. This can mean your network is being tampered with.</p>
+    <p id="warn-text">The address your device received for this site does not match what our app got from a trusted, encrypted lookup. This can mean your network is being tampered with.</p>
   </div>
+  <div class="banner banner-ok" id="b-match" role="status" hidden>
+    <h1>No mismatch found</h1>
+    <p>The address your device received matches the trusted, encrypted lookup for this site. This check found nothing wrong.</p>
+  </div>
+  <div class="banner banner-info" id="b-none" role="status" hidden>
+    <h1>Nothing to report</h1>
+    <p>This page only shows a warning when the app sends you here with a site and two addresses that do not match. Opened on its own, it has nothing to check, so there is no problem to report.</p>
+  </div>
+  <div class="banner banner-info" id="b-bad" role="status" hidden>
+    <h1>This link could not be read</h1>
+    <p>The values in the link are missing or not valid addresses, so nothing can be checked. If the app sent you here, go back and try again.</p>
+  </div>
+  <p class="demo-tag" id="demo-tag" hidden>Example only: these values are made up for a demonstration. Nothing was checked on your connection.</p>
 
   <div class="grid">
     <section aria-label="3D lamp">
@@ -89,21 +107,31 @@
       <p class="status" id="model-status">Loading the lamp (large file)…</p>
     </section>
 
-    <section aria-label="What was detected">
-      <h2>What we saw</h2>
-      <dl>
-        <dt>Site</dt><dd id="v-domain">not provided</dd>
-        <dt>Expected address</dt><dd id="v-expected">not provided</dd>
-        <dt>Your device got</dt><dd id="v-seen">not provided</dd>
-      </dl>
+    <section aria-label="Details">
+      <div id="details" hidden>
+        <h2>What the link says</h2>
+        <dl>
+          <dt>Site</dt><dd id="v-domain">not provided</dd>
+          <dt>Expected address</dt><dd id="v-expected">not provided</dd>
+          <dt>Your device got</dt><dd id="v-seen">not provided</dd>
+        </dl>
+        <p class="note" id="private-note" hidden>The address your device got is a private or local address. A public website should never resolve to one, which is a strong sign of tampering.</p>
+      </div>
 
-      <h2>What to do now</h2>
-      <ul>
-        <li>Do not enter your password or any 6-digit code on the site you were heading to.</li>
-        <li>Switch networks, for example from public Wi-Fi to mobile data.</li>
-        <li>Restart your router, and turn on Private DNS in your phone's network settings.</li>
-        <li>Open the service through its official app or by typing its address yourself.</li>
-      </ul>
+      <div id="advice" hidden>
+        <h2>What to do now</h2>
+        <ul>
+          <li>Do not enter your password or any 6-digit code on the site you were heading to.</li>
+          <li>Switch networks, for example from public Wi-Fi to mobile data.</li>
+          <li>Restart your router, and turn on Private DNS in your phone's network settings.</li>
+          <li>Open the service through its official app or by typing its address yourself.</li>
+        </ul>
+      </div>
+
+      <div id="explain" hidden>
+        <h2>About this page</h2>
+        <p>The app compares the address your device's normal DNS gives for a site with answers from trusted, encrypted DNS. If they differ in a worrying way, it sends you here instead of showing a code. You can <a href="?demo=1">see an example warning</a>.</p>
+      </div>
 
       <div class="actions">
         <a class="btn" href="about:blank" id="leave">Leave this page</a>
@@ -112,25 +140,76 @@
   </div>
 
   <footer>
-    This page has no login form and collects nothing. The values above come from the link that brought you here.
+    This page has no login form and collects nothing. It cannot check your connection itself: it only displays the values in the link that brought you here, so treat a warning as meaningful only when the app sent you.
   </footer>
 </main>
 
 <script>
-  // Show query values as plain text only, and only if they look like a hostname or IP.
   (function () {
     var params = new URLSearchParams(location.search);
-    var safe = /^[A-Za-z0-9.\-:]{1,253}$/;
-    [["domain", "v-domain"], ["expected", "v-expected"], ["seen", "v-seen"]].forEach(function (p) {
-      var v = params.get(p[0]);
-      if (v && safe.test(v)) { document.getElementById(p[1]).textContent = v; }
-    });
+    var $ = function (id) { return document.getElementById(id); };
+    var HOST = /^(?=.{1,253}$)([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$/;
+    var IPV4 = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/;
+    var IPV6 = /^[0-9a-fA-F:]{2,39}$/;
+
+    function isIp(v) { return IPV4.test(v) || (v.indexOf(":") !== -1 && IPV6.test(v)); }
+    function isPrivate(v) {
+      if (IPV4.test(v)) {
+        var p = v.split(".").map(Number);
+        return p[0] === 10 || p[0] === 127 || p[0] === 0 ||
+          (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+          (p[0] === 192 && p[1] === 168) || (p[0] === 169 && p[1] === 254);
+      }
+      var l = v.toLowerCase();
+      return l === "::1" || l === "::" || /^f[cd]/.test(l) || /^fe[89ab]/.test(l);
+    }
+    function norm(v) { return v.toLowerCase(); }
+    function show(id, on) { $(id).hidden = !on; }
+
+    var demo = params.get("demo") === "1";
+    var domain = params.get("domain");
+    var expected = params.get("expected");
+    var seen = params.get("seen");
+    if (demo) { domain = "bank.example.com"; expected = "203.0.113.7"; seen = "10.0.0.5"; }
+
+    var state;
+    if (!domain && !expected && !seen) {
+      state = "none";
+    } else if (!domain || !HOST.test(domain) || !seen || !isIp(seen) || (expected && !isIp(expected))) {
+      state = "bad";
+    } else if (isPrivate(seen) && !(expected && isPrivate(expected))) {
+      state = "warn-private";
+    } else if (!expected) {
+      state = "bad";
+    } else if (norm(expected) === norm(seen)) {
+      state = "match";
+    } else {
+      state = "warn";
+    }
+
+    document.querySelector("main").setAttribute("data-state", state);
+    var warn = state === "warn" || state === "warn-private";
+    show("b-warn", warn);
+    show("b-match", state === "match");
+    show("b-none", state === "none");
+    show("b-bad", state === "bad");
+    show("demo-tag", demo && state !== "none" && state !== "bad");
+    show("advice", warn);
+    show("explain", state === "none" || state === "match" || state === "bad");
+    show("details", state === "warn" || state === "warn-private" || state === "match");
+    show("private-note", state === "warn-private");
+
+    if (state === "warn" || state === "warn-private" || state === "match") {
+      $("v-domain").textContent = domain;
+      $("v-expected").textContent = expected;
+      $("v-seen").textContent = seen;
+    }
+    document.title = warn ? "Connection stopped" : "Connection check";
 
     var mv = document.querySelector("model-viewer");
-    var status = document.getElementById("model-status");
+    var status = $("model-status");
     mv.addEventListener("load", function () { status.textContent = "Drag to rotate the lamp."; });
-    mv.addEventListener("error", function () { status.textContent = "The lamp could not be loaded. The warning above still applies."; });
-
+    mv.addEventListener("error", function () { status.textContent = "The lamp could not be loaded."; });
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { mv.removeAttribute("auto-rotate"); }
   })();
 </script>
